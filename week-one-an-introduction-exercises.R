@@ -23,3 +23,66 @@ makeHist(10000)
 # pexp(x, lambda) # evals probability p(X < x)
 # exp(-lambda*x) # e^kx
 
+
+### Four: function, alpha beta that return mean 0.6, sd 0.1
+
+betaParams <- function(mu, sigma2) {
+  alpha <- ( (1-mu)/sigma2 - 1/mu)*mu^2
+  beta <- alpha*(1/mu - 1)
+  return(c(alpha,beta))
+}
+
+mujohn <- 0.5
+varjohn <- 0.03^2
+temp  <- betaParams(mujohn,varjohn)
+alphajohn <- temp[1]; betajohn <- temp[2]
+
+
+betaParams <- function(mu, sigma2) {
+  alpha <- ( (1-mu)/sigma2 - 1/mu)*mu^2
+  beta <- alpha*(1/mu - 1)
+  return(c(alpha,beta))
+}
+
+betaParams(0.6, 0.1)
+
+plot()
+
+
+
+# Realistic use of Data ---------------------------------------------------
+earthquakedata = read.csv("Italy.csv")
+
+# Times between successibe earthquakes
+times = diff(earthquakedata[,1])
+hist(times, breaks = 30)
+
+plot(times)
+mean(times) # [1] 36.93144
+var(times) # [1] 3425.677
+sd(times) # [1] 58.52928
+max(times) # [1] 638
+min(times) # [1] 1
+
+# Fit an exp model
+### Estimate Lambda
+E.Lambda = 1/mean(times) # [1] 0.0270772
+
+## Kolmogorov-Smirnoff Test to assess whether this model is a good fit
+# ks.test(dataset_to_use, distname, distparams)
+ks.test(times, 'pexp', E.Lambda) # p-value = 6.489e-09
+# Low P val so reject Exponential assumption
+
+# Calculate Log Likelihood
+LogLik = sum(dexp(times, E.Lambda, log=TRUE))
+LogLik
+
+
+## Alt approahc dont do it :(
+Lik = prod(dexp(times, E.Lambda, log=FALSE))
+LogLik = log(Lik)
+
+
+
+
+
